@@ -8,11 +8,12 @@ use App\Models\Product;
 class FavoriteController extends Controller
 {
     public function index()
-    {
-        $favorites = session()->get('favorites', []);
-
-        return view('favorites', compact('favorites'));
-    }
+{
+    return response()->json([
+        'session_id' => session()->getId(),
+        'favorites' => session()->get('favorites', [])
+    ]);
+}
 
     public function add($id)
     {
@@ -30,7 +31,10 @@ class FavoriteController extends Controller
 
         session()->put('favorites', $favorites);
 
-        return redirect()->back()->with('success', 'Producto agregado a favoritos');
+        return response()->json([
+            'message' => 'Producto agregado a favoritos',
+            'favorites' => $favorites
+        ]);
     }
 
     public function remove($id)
@@ -42,6 +46,9 @@ class FavoriteController extends Controller
             session()->put('favorites', $favorites);
         }
 
-        return redirect()->back()->with('success', 'Eliminado de favoritos');
+        return response()->json([
+            'message' => 'Producto eliminado de favoritos',
+            'favorites' => $favorites
+        ]);
     }
 }

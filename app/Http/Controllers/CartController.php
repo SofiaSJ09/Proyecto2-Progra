@@ -8,33 +8,37 @@ use App\Models\Product;
 class CartController extends Controller
 {
     public function index()
-    {
-        $cart = session()->get('cart', []);
-
-        return view('cart', compact('cart'));
-    }
+{
+    return response()->json([
+        'session_id' => session()->getId(),
+        'cart' => session()->get('cart', [])
+    ]);
+}
 
     public function add($id)
-    {
-        $product = Product::findOrFail($id);
+{
+    $product = Product::findOrFail($id);
 
-        $cart = session()->get('cart', []);
+    $cart = session()->get('cart', []);
 
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity']++;
-        } else {
-            $cart[$id] = [
-                "name" => $product->name,
-                "price" => $product->price,
-                "quantity" => 1,
-                "image" => $product->image
-            ];
-        }
-
-        session()->put('cart', $cart);
-
-        return redirect()->back()->with('success', 'Producto agregado al carrito');
+    if (isset($cart[$id])) {
+        $cart[$id]['quantity']++;
+    } else {
+        $cart[$id] = [
+            "name" => $product->name,
+            "price" => $product->price,
+            "quantity" => 1,
+            "image" => $product->image
+        ];
     }
+
+    session()->put('cart', $cart);
+
+    return response()->json([
+        'session_id' => session()->getId(),
+        'cart' => session()->get('cart')
+    ]);
+}
 
     public function remove($id)
     {
@@ -45,13 +49,18 @@ class CartController extends Controller
             session()->put('cart', $cart);
         }
 
-        return redirect()->back()->with('success', 'Producto eliminado del carrito');
+        return response()->json([
+            'message' => 'Producto eliminado del carrito',
+            'cart' => $cart
+        ]);
     }
 
     public function clear()
     {
         session()->forget('cart');
 
-        return redirect()->back()->with('success', 'Carrito vaciado');
+        return response()->json([
+            'message' => 'Carrito vaciado'
+        ]);
     }
 }
