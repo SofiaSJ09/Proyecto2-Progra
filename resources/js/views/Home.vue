@@ -1,55 +1,149 @@
 <template>
-    <div>
+    <section class="home-page">
 
-        <h2>Categorías</h2>
+        <div class="home-hero">
+            <div class="hero-text">
+                <h1>Los mejores celulares al mejor precio</h1>
+                <p>
+                    Descubre nuestra amplia selección de smartphones de las marcas más reconocidas.
+                    Calidad garantizada y envíos a todo el país.
+                </p>
 
-        <div v-if="categories.length">
-
-            <div
-                v-for="category in categories"
-                :key="category.id"
-            >
-                <router-link
-                    :to="'/categoria/' + category.id"
-                >
-                    {{ category.name }}
+                <router-link to="/" class="btn-primary">
+                    Ver catálogo
                 </router-link>
             </div>
 
+            <div class="hero-carousel">
+
+    <button class="carousel-btn left" @click="previousSlide">
+        ‹
+    </button>
+
+    <img
+        :src="carouselImages[currentSlide]"
+        alt="Imagen de celular"
+        class="carousel-image"
+    >
+
+    <button class="carousel-btn right" @click="nextSlide">
+        ›
+    </button>
+
+    <div class="carousel-dots">
+        <button
+            v-for="(image, index) in carouselImages"
+            :key="index"
+            :class="['dot', { active: index === currentSlide }]"
+            @click="currentSlide = index"
+        ></button>
+    </div>
+
+</div>
         </div>
 
-        <hr>
+        <section class="page-container">
 
-        <h2>Catálogo de Celulares</h2>
+            <h2 class="section-title">Recomendados</h2>
 
-        <div v-if="products.length === 0">
-            Cargando productos...
-        </div>
+            <div v-if="products.length === 0" class="empty-message">
+                Cargando productos...
+            </div>
 
-        <div
-            v-for="product in products"
-            :key="product.id"
+            <div v-else class="products-grid">
+
+                <div
+                    v-for="product in products"
+                    :key="product.id"
+                    class="product-card"
+                >
+
+                    <img
+                        v-if="product.image"
+                        :src="product.image"
+                        :alt="product.name"
+                        class="product-image"
+                    >
+
+                    <div v-else class="image-placeholder">
+                        Imagen
+                    </div>
+
+                    <p class="product-brand">
+                        {{ product.brand }}
+                    </p>
+
+                    <h3 class="product-name">
+                        {{ product.name }}
+                    </h3>
+
+                    <div class="product-specs">
+                        <span>{{ product.ram }}</span>
+                        <span>{{ product.storage }}</span>
+                    </div>
+
+                    <div class="product-specs">
+                        <span>₡{{ product.price }}</span>
+                        <span>{{ product.operating_system }}</span>
+                    </div>
+
+                    <router-link
+                        :to="'/producto/' + product.id"
+                        class="btn-secondary product-button"
+                    >
+                        Ver producto
+                    </router-link>
+
+                </div>
+
+            </div>
+
+        </section>
+
+      <section class="benefits-section">
+
+    <div class="benefit-card">
+        <img
+            :src="'/images/beneficios/compra_segura.png'"
+            alt="Compra segura"
+            class="benefit-image"
         >
 
-            <h3>{{ product.name }}</h3>
-
-            <p>{{ product.description }}</p>
-
-            <p>
-                ₡{{ product.price }}
-            </p>
-
-            <router-link
-                :to="'/producto/' + product.id"
-            >
-                Ver detalle
-            </router-link>
-
-            <hr>
-
-        </div>
-
+        <h3>Compra segura</h3>
+        <p>
+            Protegemos tus datos y tus compras para que tengas una experiencia segura.
+        </p>
     </div>
+
+    <div class="benefit-card">
+        <img
+            :src="'/images/beneficios/garantia.png'"
+            alt="Garantía incluida"
+            class="benefit-image"
+        >
+
+        <h3>Garantía incluida</h3>
+        <p>
+            Todos nuestros productos cuentan con garantía directa de la tienda.
+        </p>
+    </div>
+
+    <div class="benefit-card">
+        <img
+            :src="'/images/beneficios/envio.png'"
+            alt="Envíos a todo el país"
+            class="benefit-image"
+        >
+
+        <h3>Envíos a todo el país</h3>
+        <p>
+            Recibe tu celular en cualquier parte de Costa Rica.
+        </p>
+    </div>
+
+</section>
+
+    </section>
 </template>
 
 <script>
@@ -58,39 +152,72 @@ export default {
     data() {
         return {
             products: [],
-            categories: []
+            currentSlide: 0,
+             autoSlide: null,
+           carouselImages: [
+    '/images/carousel/iphone.png',
+    '/images/carousel/samsung.png',
+    '/images/carousel/xiaomi.png'
+]
         }
     },
 
-    created() {
+      created() {
         this.loadProducts()
-        this.loadCategories()
+    },
+
+    mounted() {
+        this.autoSlide = setInterval(() => {
+            this.nextSlide()
+        }, 3000)
+    },
+
+    beforeUnmount() {
+        clearInterval(this.autoSlide)
+    },
+
+    watch: {
+        '$route.query.search'() {
+            this.loadProducts()
+        }
     },
 
     methods: {
 
         loadProducts() {
 
-            fetch('/api/products')
+            const search = this.$route.query.search
+
+            let url = '/api/products'
+
+            if (search) {
+                url = '/api/products/search?query=' + encodeURIComponent(search)
+            }
+
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
 
-                    this.products = data.data
+                    this.products = data.data ?? data
 
                 })
 
         },
 
-        loadCategories() {
+        nextSlide() {
+            this.currentSlide++
 
-            fetch('/api/categories')
-                .then(response => response.json())
-                .then(data => {
+            if (this.currentSlide >= this.carouselImages.length) {
+                this.currentSlide = 0
+            }
+        },
 
-                    this.categories = data
+        previousSlide() {
+            this.currentSlide--
 
-                })
-
+            if (this.currentSlide < 0) {
+                this.currentSlide = this.carouselImages.length - 1
+            }
         }
 
     }
