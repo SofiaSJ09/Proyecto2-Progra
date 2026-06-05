@@ -28,14 +28,13 @@
 </div>
             </div>
             <nav class="main-nav">
-                <router-link to="/">Inicio</router-link>
-                <router-link to="/categoria/1">Alta gama</router-link>
-                <router-link to="/categoria/2">Gama media</router-link>
-                <router-link to="/categoria/3">Xiaomi</router-link>
-                <router-link to="/categoria/4">Samsung</router-link>
-                <router-link to="/categoria/5">Apple</router-link>
-                <router-link to="/categoria/6">Redmi</router-link>
-            </nav>
+    <router-link to="/">Inicio</router-link>
+
+    <router-link to="/categoria/1">Alta gama</router-link>
+    <router-link to="/categoria/2">Gama media</router-link>
+    <router-link to="/categoria/3">Gama baja</router-link>
+
+</nav>
         </header>
         <main>
             <router-view />
@@ -100,9 +99,9 @@ export default {
             }
 
             this.$router.push({
-                path: '/',
+                path: '/busqueda',
                 query: {
-                    search: text
+                    query: text
                 }
             })
         }

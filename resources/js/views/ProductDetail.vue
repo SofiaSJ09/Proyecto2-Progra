@@ -1,7 +1,6 @@
 <template>
     <section class="page-container">
 
-
         <div class="main-panel">
 
             <h2 class="page-title">Detalles del producto</h2>
@@ -108,16 +107,42 @@
 
         </div>
 
+        <AppModal
+            :show="modal.show"
+            :type="modal.type"
+            :title="modal.title"
+            :message="modal.message"
+            :confirm-text="modal.confirmText"
+            :show-cancel="modal.showCancel"
+            @confirm="closeModal"
+            @cancel="closeModal"
+        />
+
     </section>
 </template>
 
 <script>
+import AppModal from '../components/AppModal.vue'
+
 export default {
+
+    components: {
+        AppModal
+    },
 
     data() {
         return {
             product: null,
-            quantity: 1
+            quantity: 1,
+
+            modal: {
+                show: false,
+                type: 'success',
+                title: '',
+                message: '',
+                confirmText: 'Aceptar',
+                showCancel: false
+            }
         }
     },
 
@@ -157,11 +182,29 @@ export default {
                 .then(response => response.json())
                 .then(data => {
 
-                    alert(data.message ?? 'Producto agregado al carrito')
+                    this.modal = {
+                        show: true,
+                        type: 'success',
+                        title: 'Producto agregado',
+                        message: data.message ?? 'El producto fue agregado correctamente al carrito.',
+                        confirmText: 'Aceptar',
+                        showCancel: false
+                    }
 
                 })
                 .catch(error => {
+
                     console.log('ERROR:', error)
+
+                    this.modal = {
+                        show: true,
+                        type: 'danger',
+                        title: 'Error',
+                        message: 'No se pudo agregar el producto al carrito.',
+                        confirmText: 'Aceptar',
+                        showCancel: false
+                    }
+
                 })
 
         },
@@ -174,10 +217,35 @@ export default {
                 .then(response => response.json())
                 .then(data => {
 
-                    alert(data.message ?? 'Producto agregado a favoritos')
+                    this.modal = {
+                        show: true,
+                        type: 'success',
+                        title: 'Producto agregado',
+                        message: data.message ?? 'El producto fue agregado correctamente a favoritos.',
+                        confirmText: 'Aceptar',
+                        showCancel: false
+                    }
+
+                })
+                .catch(error => {
+
+                    console.log('ERROR:', error)
+
+                    this.modal = {
+                        show: true,
+                        type: 'danger',
+                        title: 'Error',
+                        message: 'No se pudo agregar el producto a favoritos.',
+                        confirmText: 'Aceptar',
+                        showCancel: false
+                    }
 
                 })
 
+        },
+
+        closeModal() {
+            this.modal.show = false
         }
 
     }

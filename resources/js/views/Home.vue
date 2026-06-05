@@ -4,6 +4,7 @@
         <div class="home-hero">
             <div class="hero-text">
                 <h1>Los mejores celulares al mejor precio</h1>
+
                 <p>
                     Descubre nuestra amplia selección de smartphones de las marcas más reconocidas.
                     Calidad garantizada y envíos a todo el país.
@@ -16,30 +17,30 @@
 
             <div class="hero-carousel">
 
-    <button class="carousel-btn left" @click="previousSlide">
-        ‹
-    </button>
+                <button class="carousel-btn left" @click="previousSlide">
+                    ‹
+                </button>
 
-    <img
-        :src="carouselImages[currentSlide]"
-        alt="Imagen de celular"
-        class="carousel-image"
-    >
+                <img
+                    :src="carouselImages[currentSlide]"
+                    alt="Imagen de celular"
+                    class="carousel-image"
+                >
 
-    <button class="carousel-btn right" @click="nextSlide">
-        ›
-    </button>
+                <button class="carousel-btn right" @click="nextSlide">
+                    ›
+                </button>
 
-    <div class="carousel-dots">
-        <button
-            v-for="(image, index) in carouselImages"
-            :key="index"
-            :class="['dot', { active: index === currentSlide }]"
-            @click="currentSlide = index"
-        ></button>
-    </div>
+                <div class="carousel-dots">
+                    <button
+                        v-for="(image, index) in carouselImages"
+                        :key="index"
+                        :class="['dot', { active: index === currentSlide }]"
+                        @click="currentSlide = index"
+                    ></button>
+                </div>
 
-</div>
+            </div>
         </div>
 
         <section class="page-container">
@@ -50,98 +51,130 @@
                 Cargando productos...
             </div>
 
-            <div v-else class="products-grid">
+            <template v-else>
 
-                <div
-                    v-for="product in products"
-                    :key="product.id"
-                    class="product-card"
-                >
+                <div class="products-grid">
 
-                    <img
-                        v-if="product.image"
-                        :src="product.image"
-                        :alt="product.name"
-                        class="product-image"
+                    <div
+                        v-for="product in products"
+                        :key="product.id"
+                        class="product-card"
                     >
 
-                    <div v-else class="image-placeholder">
-                        Imagen
+                        <img
+                            v-if="product.image"
+                            :src="product.image"
+                            :alt="product.name"
+                            class="product-image"
+                        >
+
+                        <div v-else class="image-placeholder">
+                            Imagen
+                        </div>
+
+                        <p class="product-brand">
+                            {{ product.brand }}
+                        </p>
+
+                        <h3 class="product-name">
+                            {{ product.name }}
+                        </h3>
+
+                        <div class="product-specs">
+                            <span>{{ product.ram }}</span>
+                            <span>{{ product.storage }}</span>
+                        </div>
+
+                        <div class="product-specs">
+                            <span>₡{{ product.price }}</span>
+                            <span>{{ product.operating_system }}</span>
+                        </div>
+
+                        <router-link
+                            :to="'/producto/' + product.id"
+                            class="btn-secondary product-button"
+                        >
+                            Ver producto
+                        </router-link>
+
                     </div>
-
-                    <p class="product-brand">
-                        {{ product.brand }}
-                    </p>
-
-                    <h3 class="product-name">
-                        {{ product.name }}
-                    </h3>
-
-                    <div class="product-specs">
-                        <span>{{ product.ram }}</span>
-                        <span>{{ product.storage }}</span>
-                    </div>
-
-                    <div class="product-specs">
-                        <span>₡{{ product.price }}</span>
-                        <span>{{ product.operating_system }}</span>
-                    </div>
-
-                    <router-link
-                        :to="'/producto/' + product.id"
-                        class="btn-secondary product-button"
-                    >
-                        Ver producto
-                    </router-link>
 
                 </div>
 
-            </div>
+                <div v-if="lastPage > 1" class="pagination">
+                    <button
+                        class="pagination-btn"
+                        :disabled="currentPage === 1"
+                        @click="loadProducts(currentPage - 1)"
+                    >
+                        Anterior
+                    </button>
+
+                    <button
+                        v-for="page in lastPage"
+                        :key="page"
+                        class="pagination-number"
+                        :class="{ active: page === currentPage }"
+                        @click="loadProducts(page)"
+                    >
+                        {{ page }}
+                    </button>
+
+                    <button
+                        class="pagination-btn"
+                        :disabled="currentPage === lastPage"
+                        @click="loadProducts(currentPage + 1)"
+                    >
+                        Siguiente
+                    </button>
+                </div>
+
+            </template>
 
         </section>
 
-      <section class="benefits-section">
+        <section class="benefits-section">
 
-    <div class="benefit-card">
-        <img
-            :src="'/images/beneficios/compra_segura.png'"
-            alt="Compra segura"
-            class="benefit-image"
-        >
+            <div class="benefit-card">
+                <img
+                    :src="'/images/beneficios/compra_segura.png'"
+                    alt="Compra segura"
+                    class="benefit-image"
+                >
 
-        <h3>Compra segura</h3>
-        <p>
-            Protegemos tus datos y tus compras para que tengas una experiencia segura.
-        </p>
-    </div>
+                <h3>Compra segura</h3>
+                <p>
+                    Protegemos tus datos y tus compras para que tengas una experiencia segura.
+                </p>
+            </div>
 
-    <div class="benefit-card">
-        <img
-            :src="'/images/beneficios/garantia.png'"
-            alt="Garantía incluida"
-            class="benefit-image"
-        >
+            <div class="benefit-card">
+                <img
+                    :src="'/images/beneficios/garantia.png'"
+                    alt="Garantía incluida"
+                    class="benefit-image"
+                >
 
-        <h3>Garantía incluida</h3>
-        <p>
-            Todos nuestros productos cuentan con garantía directa de la tienda.
-        </p>
-    </div>
+                <h3>Garantía incluida</h3>
+                <p>
+                    Todos nuestros productos cuentan con garantía directa de la tienda.
+                </p>
+            </div>
 
-    <div class="benefit-card">
-        <img
-            :src="'/images/beneficios/envio.png'"
-            alt="Envíos a todo el país"
-            class="benefit-image"
-        >
+            <div class="benefit-card">
+                <img
+                    :src="'/images/beneficios/envio.png'"
+                    alt="Envíos a todo el país"
+                    class="benefit-image"
+                >
 
-        <h3>Envíos a todo el país</h3>
-        <p>
-            Recibe tu celular en cualquier parte de Costa Rica.
-        </p>
-    </div>
+                <h3>Envíos a todo el país</h3>
+                <p>
+                    Recibe tu celular en cualquier parte de Costa Rica.
+                </p>
+            </div>
 
-</section>
+        </section>
 
     </section>
 </template>
@@ -153,16 +186,18 @@ export default {
         return {
             products: [],
             currentSlide: 0,
-             autoSlide: null,
-           carouselImages: [
-    '/images/carousel/iphone.png',
-    '/images/carousel/samsung.png',
-    '/images/carousel/xiaomi.png'
-]
+            autoSlide: null,
+            carouselImages: [
+                '/images/carousel/iphone.png',
+                '/images/carousel/samsung.png',
+                '/images/carousel/xiaomi.png'
+            ],
+            currentPage: 1,
+            lastPage: 1
         }
     },
 
-      created() {
+    created() {
         this.loadProducts()
     },
 
@@ -176,29 +211,17 @@ export default {
         clearInterval(this.autoSlide)
     },
 
-    watch: {
-        '$route.query.search'() {
-            this.loadProducts()
-        }
-    },
-
     methods: {
 
-        loadProducts() {
+        loadProducts(page = 1) {
 
-            const search = this.$route.query.search
-
-            let url = '/api/products'
-
-            if (search) {
-                url = '/api/products/search?query=' + encodeURIComponent(search)
-            }
-
-            fetch(url)
+            fetch('/api/products?page=' + page)
                 .then(response => response.json())
                 .then(data => {
 
-                    this.products = data.data ?? data
+                    this.products = data.data ?? []
+                    this.currentPage = data.current_page ?? 1
+                    this.lastPage = data.last_page ?? 1
 
                 })
 
