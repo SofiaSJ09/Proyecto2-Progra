@@ -5,6 +5,7 @@ import ProductDetail from '../views/ProductDetail.vue'
 import CategoryProducts from '../views/CategoryProducts.vue'
 import Cart from '../views/Cart.vue'
 import Favorites from '../views/Favorites.vue'
+import SearchResults from '../views/SearchResults.vue'
 
 const routes = [
     {
@@ -26,6 +27,10 @@ const routes = [
     {
         path: '/favoritos',
         component: Favorites
+    },
+    {
+        path: '/busqueda',
+        component: SearchResults
     }
 ]
 

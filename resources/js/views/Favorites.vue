@@ -22,14 +22,13 @@
                     class="favorite-card"
                 >
 
-                 
-                     <button
-    class="favorite-delete"
-    @click="removeProduct(product.id)"
-    title="Eliminar producto"
->
-    <img :src="'/images/delete.png'" alt="Eliminar">
-</button>
+                    <button
+                        class="favorite-delete"
+                        @click="openDeleteModal(product.id)"
+                        title="Eliminar producto"
+                    >
+                        <img :src="'/images/delete.png'" alt="Eliminar">
+                    </button>
 
                     <router-link
                         :to="'/producto/' + product.id"
@@ -79,15 +78,43 @@
 
         </div>
 
+        <AppModal
+            :show="modal.show"
+            :type="modal.type"
+            :title="modal.title"
+            :message="modal.message"
+            :confirm-text="modal.confirmText"
+            :show-cancel="modal.showCancel"
+            @confirm="confirmModal"
+            @cancel="closeModal"
+        />
+
     </section>
 </template>
 
 <script>
+import AppModal from '../components/AppModal.vue'
+
 export default {
+
+    components: {
+        AppModal
+    },
 
     data() {
         return {
-            products: []
+            products: [],
+
+            modal: {
+                show: false,
+                type: 'success',
+                title: '',
+                message: '',
+                confirmText: 'Aceptar',
+                showCancel: false,
+                productId: null,
+                action: null
+            }
         }
     },
 
@@ -112,23 +139,52 @@ export default {
 
         },
 
-        removeProduct(id) {
+        openDeleteModal(id) {
+            this.modal = {
+                show: true,
+                type: 'danger',
+                title: '¿Eliminar favorito?',
+                message: 'Esta acción eliminará el producto de tu lista de favoritos.',
+                confirmText: 'Eliminar',
+                showCancel: true,
+                productId: id,
+                action: 'delete-favorite'
+            }
+        },
 
-            if (!confirm('¿Desea eliminar este producto de favoritos?')) {
+        confirmModal() {
+            if (this.modal.action === 'delete-favorite') {
+                const productId = this.modal.productId
+
+                fetch('/api/favorites/remove/' + productId, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        this.loadFavorites()
+
+                        this.modal = {
+                            show: true,
+                            type: 'success',
+                            title: 'Favorito eliminado',
+                            message: data.message ?? 'El producto fue eliminado de favoritos.',
+                            confirmText: 'Aceptar',
+                            showCancel: false,
+                            productId: null,
+                            action: 'success'
+                        }
+
+                    })
+
                 return
             }
 
-            fetch('/api/favorites/remove/' + id, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(data => {
+            this.closeModal()
+        },
 
-                alert(data.message ?? 'Producto eliminado de favoritos')
-                this.loadFavorites()
-
-            })
-
+        closeModal() {
+            this.modal.show = false
         }
 
     }

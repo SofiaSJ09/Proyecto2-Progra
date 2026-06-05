@@ -1,7 +1,6 @@
 <template>
     <section class="page-container">
 
-
         <div class="main-panel">
 
             <h2 class="page-title">Carrito de compra</h2>
@@ -56,13 +55,13 @@
                             <strong>₡{{ productSubtotal(product) }}</strong>
                         </div>
 
-                     <button
-    class="cart-delete"
-    @click="removeProduct(product.id)"
-    title="Eliminar producto"
->
-    <img :src="'/images/delete.png'" alt="Eliminar">
-</button>
+                        <button
+                            class="cart-delete"
+                            @click="openDeleteModal(product.id)"
+                            title="Eliminar producto"
+                        >
+                            <img :src="'/images/delete.png'" alt="Eliminar">
+                        </button>
 
                     </div>
 
@@ -91,29 +90,59 @@
                         <strong>₡{{ total }}</strong>
                     </div>
 
-                    <button class="btn-primary summary-button">
-                        Facturar
-                    </button>
+                    <div class="summary-actions">
+                        <button class="summary-btn summary-btn-primary">
+                            Facturar
+                        </button>
 
-                    <router-link to="/" class="btn-secondary summary-button">
-                        Seguir comprando
-                    </router-link>
+                        <router-link to="/" class="summary-btn summary-btn-secondary">
+                            Seguir comprando
+                        </router-link>
+                    </div>
                 </aside>
 
             </div>
 
         </div>
 
+        <AppModal
+            :show="modal.show"
+            :type="modal.type"
+            :title="modal.title"
+            :message="modal.message"
+            :confirm-text="modal.confirmText"
+            :show-cancel="modal.showCancel"
+            @confirm="confirmModal"
+            @cancel="closeModal"
+        />
+
     </section>
 </template>
 
 <script>
+import AppModal from '../components/AppModal.vue'
+
 export default {
+
+    components: {
+        AppModal
+    },
 
     data() {
         return {
             products: [],
-            shipping: 5
+            shipping: 5,
+
+            modal: {
+                show: false,
+                type: 'success',
+                title: '',
+                message: '',
+                confirmText: 'Aceptar',
+                showCancel: false,
+                productId: null,
+                action: null
+            }
         }
     },
 
@@ -163,23 +192,52 @@ export default {
             return price * quantity
         },
 
-        removeProduct(id) {
+        openDeleteModal(id) {
+            this.modal = {
+                show: true,
+                type: 'danger',
+                title: '¿Eliminar producto?',
+                message: 'Esta acción eliminará el producto del carrito.',
+                confirmText: 'Eliminar',
+                showCancel: true,
+                productId: id,
+                action: 'delete-cart'
+            }
+        },
 
-            if (!confirm('¿Desea eliminar este producto del carrito?')) {
+        confirmModal() {
+            if (this.modal.action === 'delete-cart') {
+                const productId = this.modal.productId
+
+                fetch('/api/cart/remove/' + productId, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        this.loadCart()
+
+                        this.modal = {
+                            show: true,
+                            type: 'success',
+                            title: 'Producto eliminado',
+                            message: data.message ?? 'El producto fue eliminado del carrito.',
+                            confirmText: 'Aceptar',
+                            showCancel: false,
+                            productId: null,
+                            action: 'success'
+                        }
+
+                    })
+
                 return
             }
 
-            fetch('/api/cart/remove/' + id, {
-                method: 'DELETE'
-            })
-                .then(response => response.json())
-                .then(data => {
+            this.closeModal()
+        },
 
-                    alert(data.message ?? 'Producto eliminado del carrito')
-                    this.loadCart()
-
-                })
-
+        closeModal() {
+            this.modal.show = false
         }
 
     }
