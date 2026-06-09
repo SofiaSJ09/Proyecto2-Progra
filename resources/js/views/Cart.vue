@@ -91,9 +91,9 @@
                     </div>
 
                     <div class="summary-actions">
-                        <button class="summary-btn summary-btn-primary">
-                            Facturar
-                        </button>
+                        <router-link to="/facturacion" class="summary-btn summary-btn-primary">
+    Facturar
+</router-link>
 
                         <router-link to="/" class="summary-btn summary-btn-secondary">
                             Seguir comprando

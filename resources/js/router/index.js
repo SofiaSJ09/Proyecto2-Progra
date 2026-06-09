@@ -6,6 +6,8 @@ import CategoryProducts from '../views/CategoryProducts.vue'
 import Cart from '../views/Cart.vue'
 import Favorites from '../views/Favorites.vue'
 import SearchResults from '../views/SearchResults.vue'
+import Billing from '../views/Billing.vue'
+import AdminProducts from '../views/AdminProducts.vue'
 
 const routes = [
     {
@@ -31,7 +33,15 @@ const routes = [
     {
         path: '/busqueda',
         component: SearchResults
-    }
+    },
+    {
+    path: '/facturacion',
+    component: Billing
+},
+{
+    path: '/admin/productos',
+    component: AdminProducts
+}
 ]
 
 const router = createRouter({
