@@ -18,9 +18,9 @@
         <img :src="'/images/navbar/favoritos.svg'" alt="Favoritos">
     </router-link>
 
-    <span class="header-icon">
+    <router-link to="/admin/productos" class="header-icon">
         <img :src="'/images/navbar/perfil.svg'" alt="Perfil">
-    </span>
+    </router-link>
 
     <router-link to="/carrito" class="header-icon">
         <img :src="'/images/navbar/carrito.svg'" alt="Carrito">

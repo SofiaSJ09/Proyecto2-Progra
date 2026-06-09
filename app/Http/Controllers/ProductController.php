@@ -29,6 +29,7 @@ class ProductController extends Controller
             'ram' => 'required|string',
             'storage' => 'required|string',
             'operating_system' => 'required|string',
+            'image' => 'required|string',
             'category_id' => 'required|exists:categories,id'
         ]);
 
@@ -78,6 +79,7 @@ class ProductController extends Controller
             'ram' => 'required|string',
             'storage' => 'required|string',
             'operating_system' => 'required|string',
+            'image' => 'required|string',
             'category_id' => 'required|exists:categories,id'
         ]);
 
