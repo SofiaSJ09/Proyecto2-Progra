@@ -1,209 +1,299 @@
 <template>
     <section class="page-container">
-
         <div class="main-panel">
+            <div class="flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div>
+                    <h2 class="page-title m-0">
+                        Datos de facturación
+                    </h2>
 
-            <h2 class="page-title">Datos de facturación</h2>
+                    <p class="text-600 mt-2 mb-0">
+                        Completa la información para confirmar tu compra.
+                    </p>
+                </div>
 
-            <div class="billing-layout">
-
-                <form class="billing-form" @submit.prevent="confirmOrder">
-
-                    <div class="form-section">
-                        <h3>Información personal</h3>
-
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Nombre completo</label>
-                                <input
-                                    type="text"
-                                    v-model="form.fullName"
-                                    required
-                                    placeholder="Ingrese su nombre completo"
-                                >
-                            </div>
-
-                            <div class="form-group">
-                                <label>Cédula</label>
-                                <input
-                                    type="text"
-                                    v-model="form.idNumber"
-                                    required
-                                    placeholder="Ingrese su cédula"
-                                >
-                            </div>
-
-                            <div class="form-group">
-                                <label>Correo electrónico</label>
-                                <input
-                                    type="email"
-                                    v-model="form.email"
-                                    required
-                                    placeholder="correo@ejemplo.com"
-                                >
-                            </div>
-
-                            <div class="form-group">
-                                <label>Teléfono</label>
-                                <input
-                                    type="text"
-                                    v-model="form.phone"
-                                    required
-                                    placeholder="+506 8888-8888"
-                                >
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Datos de entrega</h3>
-
-                        <div class="form-group">
-                            <label>Provincia</label>
-                            <input
-                                type="text"
-                                v-model="form.province"
-                                required
-                                placeholder="Ejemplo: San José"
-                            >
-                        </div>
-
-                        <div class="form-group">
-                            <label>Dirección exacta</label>
-                            <textarea
-                                v-model="form.address"
-                                required
-                                rows="4"
-                                placeholder="Ingrese la dirección exacta de entrega"
-                            ></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Método de pago</h3>
-
-                        <div class="payment-options">
-                            <label class="payment-card">
-                                <input
-                                    type="radio"
-                                    value="Tarjeta"
-                                    v-model="form.paymentMethod"
-                                    required
-                                >
-                                <span>Tarjeta</span>
-                            </label>
-
-                            <label class="payment-card">
-                                <input
-                                    type="radio"
-                                    value="SINPE"
-                                    v-model="form.paymentMethod"
-                                >
-                                <span>SINPE Móvil</span>
-                            </label>
-
-                            <label class="payment-card">
-                                <input
-                                    type="radio"
-                                    value="Efectivo"
-                                    v-model="form.paymentMethod"
-                                >
-                                <span>Pago contra entrega</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="billing-actions">
-                        <router-link to="/carrito" class="summary-btn summary-btn-secondary">
-                            Volver al carrito
-                        </router-link>
-
-                        <button type="submit" class="summary-btn summary-btn-primary">
-                            Confirmar compra
-                        </button>
-                    </div>
-
-                </form>
-
-                <aside class="billing-summary">
-                    <h3>Resumen del pedido</h3>
-
-                    <div v-if="products.length === 0" class="billing-empty">
-                        No hay productos en el carrito.
-                    </div>
-
-                    <div v-else>
-                        <div
-                            v-for="product in products"
-                            :key="product.id"
-                            class="billing-product"
-                        >
-                            <img
-                                v-if="product.image"
-                                :src="product.image"
-                                :alt="product.name"
-                            >
-
-                            <div>
-                                <h4>{{ product.name }}</h4>
-                                <p>Cantidad: {{ product.quantity }}</p>
-                                <strong>₡{{ productSubtotal(product) }}</strong>
-                            </div>
-                        </div>
-
-                        <div class="summary-row">
-                            <span>Subtotal</span>
-                            <strong>₡{{ subtotal }}</strong>
-                        </div>
-
-                        <div class="summary-row">
-                            <span>Impuestos (13%)</span>
-                            <strong>₡{{ taxes }}</strong>
-                        </div>
-
-                        <div class="summary-row">
-                            <span>Envío</span>
-                            <strong>₡{{ shipping }}</strong>
-                        </div>
-
-                        <div class="summary-total">
-                            <span>Total</span>
-                            <strong>₡{{ total }}</strong>
-                        </div>
-                    </div>
-                </aside>
-
+                <router-link to="/carrito" class="no-underline">
+                    <Button
+                        label="Volver al carrito"
+                        icon="pi pi-arrow-left"
+                        severity="secondary"
+                    />
+                </router-link>
             </div>
 
+            <Divider />
+
+            <div class="grid align-items-start">
+                <div class="col-12 lg:col-8">
+                    <form @submit.prevent="confirmOrder">
+                        <Card class="mb-4">
+                            <template #title>
+                                Información personal
+                            </template>
+
+                            <template #content>
+                                <div class="formgrid grid">
+                                    <div class="field col-12 md:col-6">
+                                        <label for="fullName" class="font-bold block mb-2">
+                                            Nombre completo
+                                        </label>
+
+                                        <InputText
+                                            id="fullName"
+                                            v-model="form.fullName"
+                                            required
+                                            placeholder="Ingrese su nombre completo"
+                                            class="w-full"
+                                        />
+                                    </div>
+
+                                    <div class="field col-12 md:col-6">
+                                        <label for="idNumber" class="font-bold block mb-2">
+                                            Cédula
+                                        </label>
+
+                                        <InputText
+                                            id="idNumber"
+                                            v-model="form.idNumber"
+                                            required
+                                            placeholder="Ingrese su cédula"
+                                            class="w-full"
+                                        />
+                                    </div>
+
+                                    <div class="field col-12 md:col-6">
+                                        <label for="email" class="font-bold block mb-2">
+                                            Correo electrónico
+                                        </label>
+
+                                        <InputText
+                                            id="email"
+                                            v-model="form.email"
+                                            type="email"
+                                            required
+                                            placeholder="correo@ejemplo.com"
+                                            class="w-full"
+                                        />
+                                    </div>
+
+                                    <div class="field col-12 md:col-6">
+                                        <label for="phone" class="font-bold block mb-2">
+                                            Teléfono
+                                        </label>
+
+                                        <InputText
+                                            id="phone"
+                                            v-model="form.phone"
+                                            required
+                                            placeholder="+506 8888-8888"
+                                            class="w-full"
+                                        />
+                                    </div>
+                                </div>
+                            </template>
+                        </Card>
+
+                        <Card class="mb-4">
+                            <template #title>
+                                Datos de entrega
+                            </template>
+
+                            <template #content>
+                                <div class="formgrid grid">
+                                    <div class="field col-12">
+                                        <label for="province" class="font-bold block mb-2">
+                                            Provincia
+                                        </label>
+
+                                        <InputText
+                                            id="province"
+                                            v-model="form.province"
+                                            required
+                                            placeholder="Ejemplo: San José"
+                                            class="w-full"
+                                        />
+                                    </div>
+
+                                    <div class="field col-12">
+                                        <label for="address" class="font-bold block mb-2">
+                                            Dirección exacta
+                                        </label>
+
+                                        <Textarea
+                                            id="address"
+                                            v-model="form.address"
+                                            required
+                                            rows="4"
+                                            placeholder="Ingrese la dirección exacta de entrega"
+                                            class="w-full"
+                                        />
+                                    </div>
+                                </div>
+                            </template>
+                        </Card>
+
+                        <Card class="mb-4">
+                            <template #title>
+                                Método de pago
+                            </template>
+
+                            <template #content>
+                                <div class="grid">
+                                    <div
+                                        v-for="method in paymentMethods"
+                                        :key="method.value"
+                                        class="col-12 md:col-4"
+                                    >
+                                        <label class="payment-prime-card">
+                                            <RadioButton
+                                                v-model="form.paymentMethod"
+                                                :inputId="'payment-' + method.value"
+                                                name="paymentMethod"
+                                                :value="method.value"
+                                                required
+                                            />
+
+                                            <span class="font-bold">
+                                                {{ method.label }}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </template>
+                        </Card>
+
+                        <div class="flex gap-3 flex-wrap">
+                            <router-link to="/carrito" class="no-underline">
+                                <Button
+                                    label="Volver al carrito"
+                                    icon="pi pi-arrow-left"
+                                    severity="secondary"
+                                />
+                            </router-link>
+
+                            <Button
+                                type="submit"
+                                label="Confirmar compra"
+                                icon="pi pi-check"
+                            />
+                        </div>
+                    </form>
+                </div>
+
+                <aside class="col-12 lg:col-4">
+                    <Card class="billing-summary-prime">
+                        <template #title>
+                            Resumen del pedido
+                        </template>
+
+                        <template #content>
+                            <Message
+                                v-if="products.length === 0"
+                                severity="warn"
+                                :closable="false"
+                            >
+                                No hay productos en el carrito.
+                            </Message>
+
+                            <div v-else>
+                                <div
+                                    v-for="product in products"
+                                    :key="product.id"
+                                    class="billing-product-prime"
+                                >
+                                    <div class="billing-product-image-box">
+                                        <img
+                                            v-if="product.image"
+                                            :src="product.image"
+                                            :alt="product.name"
+                                        >
+
+                                        <span v-else>Imagen</span>
+                                    </div>
+
+                                    <div>
+                                        <h4 class="mt-0 mb-1 text-900">
+                                            {{ product.name }}
+                                        </h4>
+
+                                        <p class="text-600 mt-0 mb-1">
+                                            Cantidad: {{ product.quantity }}
+                                        </p>
+
+                                        <strong class="text-primary">
+                                            ₡{{ productSubtotal(product) }}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <Divider />
+
+                                <div class="summary-prime-row">
+                                    <span>Subtotal</span>
+                                    <strong>₡{{ subtotal }}</strong>
+                                </div>
+
+                                <div class="summary-prime-row">
+                                    <span>Impuestos (13%)</span>
+                                    <strong>₡{{ taxes }}</strong>
+                                </div>
+
+                                <div class="summary-prime-row">
+                                    <span>Envío</span>
+                                    <strong>₡{{ shipping }}</strong>
+                                </div>
+
+                                <Divider />
+
+                                <div class="summary-prime-total">
+                                    <span>Total</span>
+                                    <strong>₡{{ total }}</strong>
+                                </div>
+                            </div>
+                        </template>
+                    </Card>
+                </aside>
+            </div>
         </div>
 
-        <AppModal
-            :show="modal.show"
-            :type="modal.type"
-            :title="modal.title"
-            :message="modal.message"
-            :confirm-text="modal.confirmText"
-            :show-cancel="modal.showCancel"
-            @confirm="goHome"
-            @cancel="closeModal"
-        />
+        <Dialog
+            v-model:visible="modal.show"
+            :header="modal.title"
+            modal
+            :style="{ width: '28rem' }"
+        >
+            <div class="flex flex-column align-items-center text-center gap-3">
+                <i
+                    :class="modal.type === 'success' ? 'pi pi-check-circle text-primary' : 'pi pi-exclamation-triangle text-red-500'"
+                    class="modal-prime-icon"
+                ></i>
 
+                <p class="text-700 line-height-3 m-0">
+                    {{ modal.message }}
+                </p>
+
+                <Button
+                    :label="modal.confirmText"
+                    :severity="modal.type === 'danger' ? 'danger' : 'primary'"
+                    @click="goHome"
+                />
+            </div>
+        </Dialog>
     </section>
 </template>
 
 <script>
-import AppModal from '../components/AppModal.vue'
-
 export default {
-
-    components: {
-        AppModal
-    },
-
     data() {
         return {
             products: [],
             shipping: 5,
+
+            paymentMethods: [
+                { label: 'Tarjeta', value: 'Tarjeta' },
+                { label: 'SINPE Móvil', value: 'SINPE' },
+                { label: 'Pago contra entrega', value: 'Efectivo' }
+            ],
 
             form: {
                 fullName: '',
@@ -227,7 +317,6 @@ export default {
     },
 
     computed: {
-
         subtotal() {
             return this.products.reduce((total, product) => {
                 return total + this.productSubtotal(product)
@@ -241,7 +330,6 @@ export default {
         total() {
             return this.subtotal + this.taxes + this.shipping
         }
-
     },
 
     created() {
@@ -249,17 +337,14 @@ export default {
     },
 
     methods: {
-
         loadCart() {
             fetch('/api/cart')
                 .then(response => response.json())
                 .then(data => {
-
                     this.products = Object.keys(data.cart).map(id => ({
                         id,
                         ...data.cart[id]
                     }))
-
                 })
         },
 
@@ -300,10 +385,11 @@ export default {
 
         goHome() {
             this.modal.show = false
-            this.$router.push('/')
+
+            if (this.modal.type === 'success') {
+                this.$router.push('/')
+            }
         }
-
     }
-
 }
 </script>

@@ -1,258 +1,336 @@
 <template>
     <section class="page-container">
-
         <div class="main-panel">
-
-            <div class="admin-header">
+            <div class="flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                 <div>
-                    <h2 class="page-title">Panel administrativo</h2>
-                    <p class="admin-subtitle">
+                    <h2 class="page-title m-0">
+                        Panel administrativo
+                    </h2>
+
+                    <p class="text-600 mt-2 mb-0">
                         Gestión de productos de la tienda G&S.
                     </p>
                 </div>
 
-                <button class="summary-btn summary-btn-primary" @click="openCreateModal">
-                    Agregar producto
-                </button>
+                <Button
+                    label="Agregar producto"
+                    icon="pi pi-plus"
+                    @click="openCreateModal"
+                />
             </div>
 
-            <div class="admin-stats">
-                <div class="admin-stat-card">
-                    <span>Total productos</span>
-                    <strong>{{ totalProducts }}</strong>
+            <Divider />
+
+            <div class="grid mb-4">
+                <div class="col-12 md:col-4">
+                    <Card>
+                        <template #content>
+                            <span class="text-600 block mb-2">Total productos</span>
+                            <strong class="text-3xl text-primary">{{ totalProducts }}</strong>
+                        </template>
+                    </Card>
                 </div>
 
-                <div class="admin-stat-card">
-                    <span>Página actual</span>
-                    <strong>{{ currentPage }}</strong>
+                <div class="col-12 md:col-4">
+                    <Card>
+                        <template #content>
+                            <span class="text-600 block mb-2">Página actual</span>
+                            <strong class="text-3xl text-primary">{{ currentPage }}</strong>
+                        </template>
+                    </Card>
                 </div>
 
-                <div class="admin-stat-card">
-                    <span>Categorías</span>
-                    <strong>{{ categories.length }}</strong>
+                <div class="col-12 md:col-4">
+                    <Card>
+                        <template #content>
+                            <span class="text-600 block mb-2">Categorías</span>
+                            <strong class="text-3xl text-primary">{{ categories.length }}</strong>
+                        </template>
+                    </Card>
                 </div>
             </div>
 
-            <div v-if="loading" class="empty-message">
-                Cargando productos...
+            <div
+                v-if="loading"
+                class="flex flex-column align-items-center justify-content-center p-5 surface-card border-round shadow-1"
+            >
+                <ProgressSpinner />
+                <p class="text-700 mt-3 mb-0">
+                    Cargando productos...
+                </p>
             </div>
 
-            <div v-else-if="products.length === 0" class="empty-message">
-                <h3>No hay productos</h3>
-                <p>Aún no hay productos registrados.</p>
-            </div>
+            <Message
+                v-else-if="products.length === 0"
+                severity="info"
+                :closable="false"
+            >
+                Aún no hay productos registrados.
+            </Message>
 
-            <div v-else class="admin-table-card">
+            <Card v-else>
+                <template #content>
+                    <DataTable
+                        :value="products"
+                        responsiveLayout="scroll"
+                        stripedRows
+                    >
+                        <Column header="Producto">
+                            <template #body="slotProps">
+                                <div class="flex align-items-center gap-3">
+                                    <div class="admin-product-image-prime">
+                                        <img
+                                            v-if="slotProps.data.image"
+                                            :src="slotProps.data.image"
+                                            :alt="slotProps.data.name"
+                                        >
 
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Marca</th>
-                            <th>Categoría</th>
-                            <th>Precio</th>
-                            <th>RAM</th>
-                            <th>Almacenamiento</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr
-                            v-for="product in products"
-                            :key="product.id"
-                        >
-                            <td>
-                                <div class="admin-product-cell">
-                                    <img
-                                        v-if="product.image"
-                                        :src="product.image"
-                                        :alt="product.name"
-                                    >
-
-                                    <div v-else class="admin-product-placeholder">
-                                        Img
+                                        <span v-else>Img</span>
                                     </div>
 
                                     <div>
-                                        <strong>{{ product.name }}</strong>
-                                        <span>{{ product.operating_system ?? 'Sistema no registrado' }}</span>
+                                        <strong class="block text-900 mb-1">
+                                            {{ slotProps.data.name }}
+                                        </strong>
+
+                                        <span class="text-600 text-sm">
+                                            {{ slotProps.data.operating_system ?? 'Sistema no registrado' }}
+                                        </span>
                                     </div>
                                 </div>
-                            </td>
+                            </template>
+                        </Column>
 
-                            <td>{{ product.brand ?? 'Sin marca' }}</td>
+                        <Column field="brand" header="Marca">
+                            <template #body="slotProps">
+                                {{ slotProps.data.brand ?? 'Sin marca' }}
+                            </template>
+                        </Column>
 
-                            <td>{{ product.category?.name ?? 'Sin categoría' }}</td>
+                        <Column header="Categoría">
+                            <template #body="slotProps">
+                                <Tag
+                                    :value="slotProps.data.category?.name ?? 'Sin categoría'"
+                                    severity="info"
+                                />
+                            </template>
+                        </Column>
 
-                            <td>₡{{ product.price }}</td>
+                        <Column header="Precio">
+                            <template #body="slotProps">
+                                <strong>₡{{ slotProps.data.price }}</strong>
+                            </template>
+                        </Column>
 
-                            <td>{{ product.ram ?? 'N/A' }}</td>
+                        <Column header="RAM">
+                            <template #body="slotProps">
+                                {{ slotProps.data.ram ?? 'N/A' }}
+                            </template>
+                        </Column>
 
-                            <td>{{ product.storage ?? 'N/A' }}</td>
+                        <Column header="Almacenamiento">
+                            <template #body="slotProps">
+                                {{ slotProps.data.storage ?? 'N/A' }}
+                            </template>
+                        </Column>
 
-                            <td>
-                                <div class="admin-actions">
-                                    <button class="admin-btn edit" @click="openEditModal(product)">
-                                        Editar
-                                    </button>
+                        <Column header="Acciones">
+                            <template #body="slotProps">
+                                <div class="flex gap-2">
+                                    <Button
+                                        icon="pi pi-pencil"
+                                        label="Editar"
+                                        severity="secondary"
+                                        size="small"
+                                        @click="openEditModal(slotProps.data)"
+                                    />
 
-                                    <button class="admin-btn delete" @click="openDeleteModal(product.id)">
-                                        Eliminar
-                                    </button>
+                                    <Button
+                                        icon="pi pi-trash"
+                                        label="Eliminar"
+                                        severity="danger"
+                                        size="small"
+                                        @click="openDeleteModal(slotProps.data.id)"
+                                    />
                                 </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </template>
+                        </Column>
+                    </DataTable>
 
-                <div v-if="lastPage > 1" class="pagination">
-                    <button
-                        class="pagination-btn"
-                        :disabled="currentPage === 1"
-                        @click="changePage(currentPage - 1)"
+                    <div
+                        v-if="lastPage > 1"
+                        class="flex justify-content-center align-items-center gap-2 mt-4 flex-wrap"
                     >
-                        Anterior
-                    </button>
+                        <Button
+                            label="Anterior"
+                            icon="pi pi-angle-left"
+                            severity="secondary"
+                            :disabled="currentPage === 1"
+                            @click="changePage(currentPage - 1)"
+                        />
 
-                    <button
-                        v-for="page in lastPage"
-                        :key="page"
-                        class="pagination-number"
-                        :class="{ active: currentPage === page }"
-                        @click="changePage(page)"
-                    >
-                        {{ page }}
-                    </button>
+                        <Button
+                            v-for="page in lastPage"
+                            :key="page"
+                            :label="String(page)"
+                            :severity="currentPage === page ? 'primary' : 'secondary'"
+                            @click="changePage(page)"
+                        />
 
-                    <button
-                        class="pagination-btn"
-                        :disabled="currentPage === lastPage"
-                        @click="changePage(currentPage + 1)"
-                    >
-                        Siguiente
-                    </button>
+                        <Button
+                            label="Siguiente"
+                            icon="pi pi-angle-right"
+                            iconPos="right"
+                            severity="secondary"
+                            :disabled="currentPage === lastPage"
+                            @click="changePage(currentPage + 1)"
+                        />
+                    </div>
+                </template>
+            </Card>
+        </div>
+
+        <Dialog
+            v-model:visible="productModal.show"
+            :header="productModal.mode === 'create' ? 'Agregar producto' : 'Editar producto'"
+            modal
+            :style="{ width: '48rem' }"
+        >
+            <form @submit.prevent="saveProduct">
+                <div class="formgrid grid">
+                    <div class="field col-12 md:col-6">
+                        <label for="name" class="font-bold block mb-2">Nombre</label>
+                        <InputText id="name" v-model="form.name" required class="w-full" />
+                    </div>
+
+                    <div class="field col-12 md:col-6">
+                        <label for="brand" class="font-bold block mb-2">Marca</label>
+                        <InputText id="brand" v-model="form.brand" required class="w-full" />
+                    </div>
+
+                    <div class="field col-12 md:col-6">
+                        <label for="price" class="font-bold block mb-2">Precio</label>
+                        <InputNumber
+                            id="price"
+                            v-model="form.price"
+                            required
+                            inputClass="w-full"
+                            class="w-full"
+                            :min="0"
+                        />
+                    </div>
+
+                    <div class="field col-12 md:col-6">
+                        <label for="ram" class="font-bold block mb-2">RAM</label>
+                        <InputText id="ram" v-model="form.ram" required class="w-full" />
+                    </div>
+
+                    <div class="field col-12 md:col-6">
+                        <label for="storage" class="font-bold block mb-2">Almacenamiento</label>
+                        <InputText id="storage" v-model="form.storage" required class="w-full" />
+                    </div>
+
+                    <div class="field col-12 md:col-6">
+                        <label for="operating_system" class="font-bold block mb-2">Sistema operativo</label>
+                        <InputText
+                            id="operating_system"
+                            v-model="form.operating_system"
+                            required
+                            class="w-full"
+                        />
+                    </div>
+
+                    <div class="field col-12 md:col-6">
+                        <label for="category" class="font-bold block mb-2">Categoría</label>
+                        <Dropdown
+                            id="category"
+                            v-model="form.category_id"
+                            :options="categories"
+                            optionLabel="name"
+                            optionValue="id"
+                            placeholder="Seleccione una categoría"
+                            required
+                            class="w-full"
+                        />
+                    </div>
+
+                    <div class="field col-12 md:col-6">
+                        <label for="image" class="font-bold block mb-2">Link de imagen</label>
+                        <InputText id="image" v-model="form.image" required class="w-full" />
+                    </div>
+
+                    <div class="field col-12">
+                        <label for="description" class="font-bold block mb-2">Descripción</label>
+                        <Textarea
+                            id="description"
+                            v-model="form.description"
+                            rows="4"
+                            required
+                            class="w-full"
+                        />
+                    </div>
                 </div>
 
+                <div v-if="form.image" class="admin-image-preview-prime">
+                    <span>Vista previa</span>
+                    <img :src="form.image" alt="Vista previa">
+                </div>
+
+                <div class="flex justify-content-end gap-2 mt-4">
+                    <Button
+                        type="button"
+                        label="Cancelar"
+                        icon="pi pi-times"
+                        severity="secondary"
+                        @click="closeProductModal"
+                    />
+
+                    <Button
+                        type="submit"
+                        :label="productModal.mode === 'create' ? 'Guardar producto' : 'Actualizar producto'"
+                        icon="pi pi-check"
+                    />
+                </div>
+            </form>
+        </Dialog>
+
+        <Dialog
+            v-model:visible="modal.show"
+            :header="modal.title"
+            modal
+            :style="{ width: '28rem' }"
+        >
+            <div class="flex flex-column align-items-center text-center gap-3">
+                <i
+                    :class="modal.type === 'success' ? 'pi pi-check-circle text-primary' : 'pi pi-exclamation-triangle text-red-500'"
+                    class="modal-prime-icon"
+                ></i>
+
+                <p class="text-700 line-height-3 m-0">
+                    {{ modal.message }}
+                </p>
+
+                <div class="flex justify-content-center gap-2 mt-2">
+                    <Button
+                        v-if="modal.showCancel"
+                        label="Cancelar"
+                        severity="secondary"
+                        @click="closeModal"
+                    />
+
+                    <Button
+                        :label="modal.confirmText"
+                        :severity="modal.type === 'danger' ? 'danger' : 'primary'"
+                        @click="confirmModal"
+                    />
+                </div>
             </div>
-
-        </div>
-
-        <div v-if="productModal.show" class="modal-overlay">
-            <div class="admin-product-modal">
-
-                <h2>
-                    {{ productModal.mode === 'create' ? 'Agregar producto' : 'Editar producto' }}
-                </h2>
-
-                <form @submit.prevent="saveProduct">
-
-                    <div class="form-grid">
-
-                        <div class="form-group">
-                            <label>Nombre</label>
-                            <input type="text" v-model="form.name" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Marca</label>
-                            <input type="text" v-model="form.brand" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Precio</label>
-                            <input type="number" v-model="form.price" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>RAM</label>
-                            <input type="text" v-model="form.ram" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Almacenamiento</label>
-                            <input type="text" v-model="form.storage" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Sistema operativo</label>
-                            <input type="text" v-model="form.operating_system" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Categoría</label>
-                            <select v-model="form.category_id" required>
-                                <option value="">Seleccione una categoría</option>
-
-                                <option
-                                    v-for="category in categories"
-                                    :key="category.id"
-                                    :value="category.id"
-                                >
-                                    {{ category.name }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Link de imagen</label>
-                            <input type="text" v-model="form.image" required>
-                        </div>
-
-                    </div>
-
-                    <div class="form-group">
-                        <label>Descripción</label>
-                        <textarea v-model="form.description" rows="4" required></textarea>
-                    </div>
-
-                    <div v-if="form.image" class="admin-image-preview">
-                        <span>Vista previa</span>
-                        <img :src="form.image" alt="Vista previa">
-                    </div>
-
-                    <div class="admin-modal-actions">
-                        <button
-                            type="button"
-                            class="summary-btn summary-btn-secondary"
-                            @click="closeProductModal"
-                        >
-                            Cancelar
-                        </button>
-
-                        <button type="submit" class="summary-btn summary-btn-primary">
-                            {{ productModal.mode === 'create' ? 'Guardar producto' : 'Actualizar producto' }}
-                        </button>
-                    </div>
-
-                </form>
-
-            </div>
-        </div>
-
-        <AppModal
-            :show="modal.show"
-            :type="modal.type"
-            :title="modal.title"
-            :message="modal.message"
-            :confirm-text="modal.confirmText"
-            :show-cancel="modal.showCancel"
-            @confirm="confirmModal"
-            @cancel="closeModal"
-        />
-
+        </Dialog>
     </section>
 </template>
 
 <script>
-import AppModal from '../components/AppModal.vue'
-
 export default {
-
-    components: {
-        AppModal
-    },
-
     data() {
         return {
             products: [],
@@ -300,7 +378,6 @@ export default {
     },
 
     methods: {
-
         loadProducts(page = 1) {
             this.loading = true
 
@@ -343,7 +420,7 @@ export default {
                 id: null,
                 name: '',
                 description: '',
-                price: '',
+                price: null,
                 brand: '',
                 ram: '',
                 storage: '',
@@ -363,7 +440,7 @@ export default {
                 id: product.id,
                 name: product.name ?? '',
                 description: product.description ?? '',
-                price: product.price ?? '',
+                price: Number(product.price) || 0,
                 brand: product.brand ?? '',
                 ram: product.ram ?? '',
                 storage: product.storage ?? '',
@@ -546,8 +623,6 @@ export default {
         closeModal() {
             this.modal.show = false
         }
-
     }
-
 }
 </script>
