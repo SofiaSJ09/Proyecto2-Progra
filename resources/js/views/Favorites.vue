@@ -1,106 +1,167 @@
 <template>
     <section class="page-container">
-
         <div class="main-panel">
+            <div class="flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div>
+                    <h2 class="page-title m-0">
+                        Favoritos
+                    </h2>
 
-            <h2 class="page-title">Favoritos</h2>
+                    <p class="text-600 mt-2 mb-0">
+                        Aquí puedes ver los productos que agregaste a tu lista de favoritos.
+                    </p>
+                </div>
 
-            <div v-if="products.length === 0" class="empty-message">
-                <h3>No hay favoritos</h3>
-                <p>Aún no has agregado productos a favoritos.</p>
-
-                <router-link to="/" class="btn-primary">
-                    Ver productos
+                <router-link to="/" class="no-underline">
+                    <Button
+                        label="Ver productos"
+                        icon="pi pi-shopping-bag"
+                        severity="secondary"
+                    />
                 </router-link>
             </div>
 
-            <div v-else class="favorites-grid">
+            <Divider />
 
+            <div
+                v-if="products.length === 0"
+                class="surface-card border-round shadow-1 p-5 text-center"
+            >
+                <i class="pi pi-heart favorite-empty-icon"></i>
+
+                <h3 class="text-2xl text-900 mb-2">
+                    No hay favoritos
+                </h3>
+
+                <p class="text-600 mb-4">
+                    Aún no has agregado productos a favoritos.
+                </p>
+
+                <router-link to="/" class="no-underline">
+                    <Button
+                        label="Ver productos"
+                        icon="pi pi-shopping-bag"
+                    />
+                </router-link>
+            </div>
+
+            <div v-else class="grid">
                 <div
                     v-for="product in products"
                     :key="product.id"
-                    class="favorite-card"
+                    class="col-12 sm:col-6 lg:col-4 xl:col-3"
                 >
+                    <Card class="h-full favorite-prime-card">
+                        <template #header>
+                            <div class="favorite-image-box-prime">
+                                <Button
+                                    icon="pi pi-trash"
+                                    severity="danger"
+                                    rounded
+                                    text
+                                    class="favorite-delete-prime"
+                                    title="Eliminar producto"
+                                    @click="openDeleteModal(product.id)"
+                                />
 
-                    <button
-                        class="favorite-delete"
-                        @click="openDeleteModal(product.id)"
-                        title="Eliminar producto"
-                    >
-                        <img :src="'/images/delete.png'" alt="Eliminar">
-                    </button>
+                                <router-link
+                                    :to="'/producto/' + product.id"
+                                    class="no-underline"
+                                >
+                                    <img
+                                        v-if="product.image"
+                                        :src="product.image"
+                                        :alt="product.name"
+                                        class="favorite-image-prime"
+                                    >
 
-                    <router-link
-                        :to="'/producto/' + product.id"
-                        class="favorite-image-link"
-                    >
-                        <img
-                            v-if="product.image"
-                            :src="product.image"
-                            :alt="product.name"
-                            class="favorite-image"
-                        >
+                                    <div v-else class="favorite-placeholder-prime">
+                                        Imagen
+                                    </div>
+                                </router-link>
+                            </div>
+                        </template>
 
-                        <div v-else class="favorite-placeholder">
-                            Imagen
-                        </div>
-                    </router-link>
+                        <template #title>
+                            <span class="text-xl">
+                                {{ product.name }}
+                            </span>
+                        </template>
 
-                    <p class="product-brand">
-                        {{ product.brand ?? 'Celular' }}
-                    </p>
+                        <template #subtitle>
+                            <span class="text-primary font-semibold">
+                                {{ product.brand ?? 'Celular' }}
+                            </span>
+                        </template>
 
-                    <h3 class="favorite-name">
-                        {{ product.name }}
-                    </h3>
+                        <template #content>
+                            <div class="flex flex-column gap-2">
+                                <div class="flex justify-content-between text-700">
+                                    <span v-if="product.ram">{{ product.ram }}</span>
+                                    <span v-if="product.storage">{{ product.storage }}</span>
+                                </div>
 
-                    <div class="favorite-specs">
-                        <span v-if="product.ram">{{ product.ram }}</span>
-                        <span v-if="product.storage">{{ product.storage }}</span>
-                    </div>
+                                <p class="text-2xl font-bold text-900 m-0">
+                                    ₡{{ product.price }}
+                                </p>
+                            </div>
+                        </template>
 
-                    <div class="favorite-bottom">
-                        <p class="favorite-price">
-                            ₡{{ product.price }}
-                        </p>
-
-                        <router-link
-                            :to="'/producto/' + product.id"
-                            class="favorite-detail-link"
-                        >
-                            Ver detalle
-                        </router-link>
-                    </div>
-
+                        <template #footer>
+                            <router-link
+                                :to="'/producto/' + product.id"
+                                class="no-underline"
+                            >
+                                <Button
+                                    label="Ver detalle"
+                                    icon="pi pi-eye"
+                                    severity="secondary"
+                                    class="w-full"
+                                />
+                            </router-link>
+                        </template>
+                    </Card>
                 </div>
-
             </div>
-
         </div>
 
-        <AppModal
-            :show="modal.show"
-            :type="modal.type"
-            :title="modal.title"
-            :message="modal.message"
-            :confirm-text="modal.confirmText"
-            :show-cancel="modal.showCancel"
-            @confirm="confirmModal"
-            @cancel="closeModal"
-        />
+        <Dialog
+            v-model:visible="modal.show"
+            :header="modal.title"
+            modal
+            :style="{ width: '28rem' }"
+        >
+            <div class="flex flex-column align-items-center text-center gap-3">
+                <i
+                    :class="modal.type === 'success' ? 'pi pi-check-circle text-primary' : 'pi pi-exclamation-triangle text-red-500'"
+                    class="modal-prime-icon"
+                ></i>
 
+                <p class="text-700 line-height-3 m-0">
+                    {{ modal.message }}
+                </p>
+
+                <div class="flex justify-content-center gap-2 mt-2">
+                    <Button
+                        v-if="modal.showCancel"
+                        label="Cancelar"
+                        severity="secondary"
+                        @click="closeModal"
+                    />
+
+                    <Button
+                        :label="modal.confirmText"
+                        :severity="modal.type === 'danger' ? 'danger' : 'primary'"
+                        @click="confirmModal"
+                    />
+                </div>
+            </div>
+        </Dialog>
     </section>
 </template>
 
 <script>
-import AppModal from '../components/AppModal.vue'
-
 export default {
-
-    components: {
-        AppModal
-    },
-
     data() {
         return {
             products: [],
@@ -123,20 +184,15 @@ export default {
     },
 
     methods: {
-
         loadFavorites() {
-
             fetch('/api/favorites')
                 .then(response => response.json())
                 .then(data => {
-
                     this.products = Object.keys(data.favorites).map(id => ({
                         id,
                         ...data.favorites[id]
                     }))
-
                 })
-
         },
 
         openDeleteModal(id) {
@@ -161,7 +217,6 @@ export default {
                 })
                     .then(response => response.json())
                     .then(data => {
-
                         this.loadFavorites()
 
                         this.modal = {
@@ -174,7 +229,6 @@ export default {
                             productId: null,
                             action: 'success'
                         }
-
                     })
 
                 return
@@ -186,8 +240,6 @@ export default {
         closeModal() {
             this.modal.show = false
         }
-
     }
-
 }
 </script>

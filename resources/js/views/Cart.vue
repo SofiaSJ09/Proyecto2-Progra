@@ -1,133 +1,210 @@
 <template>
     <section class="page-container">
-
         <div class="main-panel">
+            <div class="flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div>
+                    <h2 class="page-title m-0">
+                        Carrito de compra
+                    </h2>
 
-            <h2 class="page-title">Carrito de compra</h2>
+                    <p class="text-600 mt-2 mb-0">
+                        Revisa los productos agregados antes de continuar con la facturación.
+                    </p>
+                </div>
 
-            <div v-if="products.length === 0" class="empty-message">
-                <h3>Carrito vacío</h3>
-                <p>No has agregado productos al carrito.</p>
-
-                <router-link to="/" class="btn-primary">
-                    Seguir comprando
+                <router-link to="/" class="no-underline">
+                    <Button
+                        label="Seguir comprando"
+                        icon="pi pi-shopping-bag"
+                        severity="secondary"
+                    />
                 </router-link>
             </div>
 
-            <div v-else class="cart-layout">
+            <Divider />
 
-                <div class="cart-products">
+            <div
+                v-if="products.length === 0"
+                class="surface-card border-round shadow-1 p-5 text-center"
+            >
+                <i class="pi pi-shopping-cart cart-empty-icon"></i>
 
-                    <div
-                        v-for="product in products"
-                        :key="product.id"
-                        class="cart-item"
-                    >
+                <h3 class="text-2xl text-900 mb-2">
+                    Carrito vacío
+                </h3>
 
-                        <div class="cart-image-box">
-                            <img
-                                v-if="product.image"
-                                :src="product.image"
-                                :alt="product.name"
-                                class="cart-image"
-                            >
+                <p class="text-600 mb-4">
+                    No has agregado productos al carrito.
+                </p>
 
-                            <span v-else>Imagen</span>
-                        </div>
-
-                        <div class="cart-info">
-                            <h3>{{ product.name }}</h3>
-
-                            <p>
-                                {{ product.brand ?? 'Celular' }}
-                                <span v-if="product.ram"> • {{ product.ram }}</span>
-                                <span v-if="product.storage"> • {{ product.storage }}</span>
-                            </p>
-
-                            <div class="cart-quantity">
-                                <span>Cantidad:</span>
-                                <strong>{{ product.quantity }}</strong>
-                            </div>
-                        </div>
-
-                        <div class="cart-price">
-                            <span>Subtotal</span>
-                            <strong>₡{{ productSubtotal(product) }}</strong>
-                        </div>
-
-                        <button
-                            class="cart-delete"
-                            @click="openDeleteModal(product.id)"
-                            title="Eliminar producto"
-                        >
-                            <img :src="'/images/delete.png'" alt="Eliminar">
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <aside class="cart-summary">
-                    <h3>Resumen de compra</h3>
-
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <strong>₡{{ subtotal }}</strong>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Impuestos (13%)</span>
-                        <strong>₡{{ taxes }}</strong>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Envío</span>
-                        <strong>₡{{ shipping }}</strong>
-                    </div>
-
-                    <div class="summary-total">
-                        <span>Total</span>
-                        <strong>₡{{ total }}</strong>
-                    </div>
-
-                    <div class="summary-actions">
-                        <router-link to="/facturacion" class="summary-btn summary-btn-primary">
-    Facturar
-</router-link>
-
-                        <router-link to="/" class="summary-btn summary-btn-secondary">
-                            Seguir comprando
-                        </router-link>
-                    </div>
-                </aside>
-
+                <router-link to="/" class="no-underline">
+                    <Button
+                        label="Seguir comprando"
+                        icon="pi pi-shopping-bag"
+                    />
+                </router-link>
             </div>
 
+            <div v-else class="grid align-items-start">
+                <div class="col-12 lg:col-8">
+                    <div class="flex flex-column gap-3">
+                        <Card
+                            v-for="product in products"
+                            :key="product.id"
+                            class="cart-prime-card"
+                        >
+                            <template #content>
+                                <div class="grid align-items-center">
+                                    <div class="col-12 md:col-3">
+                                        <div class="cart-image-box-prime">
+                                            <img
+                                                v-if="product.image"
+                                                :src="product.image"
+                                                :alt="product.name"
+                                                class="cart-image-prime"
+                                            >
+
+                                            <span v-else class="text-600 font-bold">
+                                                Imagen
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 md:col-5">
+                                        <h3 class="text-2xl text-900 mt-0 mb-2">
+                                            {{ product.name }}
+                                        </h3>
+
+                                        <p class="text-600 mb-3">
+                                            {{ product.brand ?? 'Celular' }}
+                                            <span v-if="product.ram"> • {{ product.ram }}</span>
+                                            <span v-if="product.storage"> • {{ product.storage }}</span>
+                                        </p>
+
+                                        <div class="flex align-items-center gap-2">
+                                            <span class="text-600">Cantidad:</span>
+                                            <strong class="cart-quantity-badge">
+                                                {{ product.quantity }}
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 md:col-3">
+                                        <span class="text-600 block mb-2">
+                                            Subtotal
+                                        </span>
+
+                                        <strong class="text-2xl text-900">
+                                            ₡{{ productSubtotal(product) }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="col-12 md:col-1 flex md:justify-content-end">
+                                        <Button
+                                            icon="pi pi-trash"
+                                            severity="danger"
+                                            rounded
+                                            text
+                                            title="Eliminar producto"
+                                            @click="openDeleteModal(product.id)"
+                                        />
+                                    </div>
+                                </div>
+                            </template>
+                        </Card>
+                    </div>
+                </div>
+
+                <aside class="col-12 lg:col-4">
+                    <Card class="cart-summary-prime">
+                        <template #title>
+                            Resumen de compra
+                        </template>
+
+                        <template #content>
+                            <div class="summary-prime-row">
+                                <span>Subtotal</span>
+                                <strong>₡{{ subtotal }}</strong>
+                            </div>
+
+                            <div class="summary-prime-row">
+                                <span>Impuestos (13%)</span>
+                                <strong>₡{{ taxes }}</strong>
+                            </div>
+
+                            <div class="summary-prime-row">
+                                <span>Envío</span>
+                                <strong>₡{{ shipping }}</strong>
+                            </div>
+
+                            <Divider />
+
+                            <div class="summary-prime-total">
+                                <span>Total</span>
+                                <strong>₡{{ total }}</strong>
+                            </div>
+
+                            <div class="flex flex-column gap-3 mt-4">
+                                <router-link to="/facturacion" class="no-underline">
+                                    <Button
+                                        label="Facturar"
+                                        icon="pi pi-credit-card"
+                                        class="w-full"
+                                    />
+                                </router-link>
+
+                                <router-link to="/" class="no-underline">
+                                    <Button
+                                        label="Seguir comprando"
+                                        icon="pi pi-shopping-bag"
+                                        severity="secondary"
+                                        class="w-full"
+                                    />
+                                </router-link>
+                            </div>
+                        </template>
+                    </Card>
+                </aside>
+            </div>
         </div>
 
-        <AppModal
-            :show="modal.show"
-            :type="modal.type"
-            :title="modal.title"
-            :message="modal.message"
-            :confirm-text="modal.confirmText"
-            :show-cancel="modal.showCancel"
-            @confirm="confirmModal"
-            @cancel="closeModal"
-        />
+        <Dialog
+            v-model:visible="modal.show"
+            :header="modal.title"
+            modal
+            :style="{ width: '28rem' }"
+        >
+            <div class="flex flex-column align-items-center text-center gap-3">
+                <i
+                    :class="modal.type === 'success' ? 'pi pi-check-circle text-primary' : 'pi pi-exclamation-triangle text-red-500'"
+                    class="modal-prime-icon"
+                ></i>
 
+                <p class="text-700 line-height-3 m-0">
+                    {{ modal.message }}
+                </p>
+
+                <div class="flex justify-content-center gap-2 mt-2">
+                    <Button
+                        v-if="modal.showCancel"
+                        label="Cancelar"
+                        severity="secondary"
+                        @click="closeModal"
+                    />
+
+                    <Button
+                        :label="modal.confirmText"
+                        :severity="modal.type === 'danger' ? 'danger' : 'primary'"
+                        @click="confirmModal"
+                    />
+                </div>
+            </div>
+        </Dialog>
     </section>
 </template>
 
 <script>
-import AppModal from '../components/AppModal.vue'
-
 export default {
-
-    components: {
-        AppModal
-    },
-
     data() {
         return {
             products: [],
@@ -147,7 +224,6 @@ export default {
     },
 
     computed: {
-
         subtotal() {
             return this.products.reduce((total, product) => {
                 return total + this.productSubtotal(product)
@@ -161,7 +237,6 @@ export default {
         total() {
             return this.subtotal + this.taxes + this.shipping
         }
-
     },
 
     created() {
@@ -169,20 +244,15 @@ export default {
     },
 
     methods: {
-
         loadCart() {
-
             fetch('/api/cart')
                 .then(response => response.json())
                 .then(data => {
-
                     this.products = Object.keys(data.cart).map(id => ({
                         id,
                         ...data.cart[id]
                     }))
-
                 })
-
         },
 
         productSubtotal(product) {
@@ -214,7 +284,6 @@ export default {
                 })
                     .then(response => response.json())
                     .then(data => {
-
                         this.loadCart()
 
                         this.modal = {
@@ -227,7 +296,6 @@ export default {
                             productId: null,
                             action: 'success'
                         }
-
                     })
 
                 return
@@ -239,8 +307,6 @@ export default {
         closeModal() {
             this.modal.show = false
         }
-
     }
-
 }
 </script>

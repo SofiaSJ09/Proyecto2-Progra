@@ -1,250 +1,305 @@
 <template>
     <section class="page-container">
-
         <div class="main-panel">
+            <div class="flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <div>
+                    <h2 class="page-title m-0">
+                        {{ category.name }}
+                    </h2>
+                    <p class="text-600 mt-2 mb-0">
+                        Filtra los productos según marca, gama, sistema, memoria o precio.
+                    </p>
+                </div>
 
-            <h2 class="page-title">
-                {{ category.name }}
-            </h2>
+                <Button
+                    label="Limpiar filtros"
+                    icon="pi pi-filter-slash"
+                    severity="secondary"
+                    @click="clearFilters"
+                />
+            </div>
 
-            <div class="catalog-layout">
+            <Divider />
 
-                <aside class="filters-panel">
-                    <h3>Filtros</h3>
+            <div class="grid align-items-start">
+                <aside class="col-12 lg:col-3">
+                    <Card class="filters-prime-card">
+                        <template #title>
+                            <div class="flex align-items-center gap-2">
+                                <i class="pi pi-filter"></i>
+                                <span>Filtros</span>
+                            </div>
+                        </template>
 
-                    <!-- Marca: solo aparece si NO estás en una categoría de marca -->
-                    <div class="filter-card" v-if="!isBrandCategory">
-                        <h4>Marca</h4>
+                        <template #content>
+                            <div class="flex flex-column gap-4">
+                                <div v-if="!isBrandCategory">
+                                    <h4 class="filter-title">Marca</h4>
 
-                        <label>
-                            <input type="checkbox" value="Xiaomi" v-model="selectedBrands">
-                            Xiaomi
-                        </label>
+                                    <div class="flex flex-column gap-3">
+                                        <div
+                                            v-for="brand in brands"
+                                            :key="brand"
+                                            class="field-checkbox m-0"
+                                        >
+                                            <Checkbox
+                                                v-model="selectedBrands"
+                                                :inputId="'brand-' + brand"
+                                                :value="brand"
+                                            />
+                                            <label :for="'brand-' + brand">
+                                                {{ brand }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <label>
-                            <input type="checkbox" value="Samsung" v-model="selectedBrands">
-                            Samsung
-                        </label>
+                                <div>
+                                    <h4 class="filter-title">Gama</h4>
 
-                        <label>
-                            <input type="checkbox" value="Apple" v-model="selectedBrands">
-                            Apple
-                        </label>
+                                    <div class="flex flex-column gap-3">
+                                        <div
+                                            v-for="range in ranges"
+                                            :key="range"
+                                            class="field-checkbox m-0"
+                                        >
+                                            <Checkbox
+                                                v-model="selectedRanges"
+                                                :inputId="'range-' + range"
+                                                :value="range"
+                                            />
+                                            <label :for="'range-' + range">
+                                                {{ range }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <label>
-                            <input type="checkbox" value="Redmi" v-model="selectedBrands">
-                            Redmi
-                        </label>
+                                <div>
+                                    <h4 class="filter-title">Sistema Operativo</h4>
 
-                        <label>
-                            <input type="checkbox" value="Motorola" v-model="selectedBrands">
-                            Motorola
-                        </label>
+                                    <div class="flex flex-column gap-3">
+                                        <div
+                                            v-for="system in systems"
+                                            :key="system"
+                                            class="field-checkbox m-0"
+                                        >
+                                            <Checkbox
+                                                v-model="selectedSystems"
+                                                :inputId="'system-' + system"
+                                                :value="system"
+                                            />
+                                            <label :for="'system-' + system">
+                                                {{ system }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <label>
-                            <input type="checkbox" value="Huawei" v-model="selectedBrands">
-                            Huawei
-                        </label>
+                                <div>
+                                    <h4 class="filter-title">Memoria</h4>
 
-                        <label>
-                            <input type="checkbox" value="Realme" v-model="selectedBrands">
-                            Realme
-                        </label>
+                                    <div class="flex flex-column gap-3">
+                                        <div
+                                            v-for="memory in memories"
+                                            :key="memory.value"
+                                            class="field-checkbox m-0"
+                                        >
+                                            <Checkbox
+                                                v-model="selectedMemories"
+                                                :inputId="'memory-' + memory.value"
+                                                :value="memory.value"
+                                            />
+                                            <label :for="'memory-' + memory.value">
+                                                {{ memory.label }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <label>
-                            <input type="checkbox" value="Oppo" v-model="selectedBrands">
-                            Oppo
-                        </label>
-                    </div>
+                                <div>
+                                    <h4 class="filter-title">Precio</h4>
 
-                    <div class="filter-card">
-                        <h4>Gama</h4>
+                                    <div class="formgrid grid">
+                                        <div class="field col-12">
+                                            <label for="minPrice">Mínimo</label>
+                                            <InputNumber
+                                                id="minPrice"
+                                                v-model="minPrice"
+                                                inputClass="w-full"
+                                                class="w-full"
+                                                :min="0"
+                                            />
+                                        </div>
 
-                        <label>
-                            <input type="checkbox" value="Alta gama" v-model="selectedRanges">
-                            Alta gama
-                        </label>
-
-                        <label>
-                            <input type="checkbox" value="Gama media" v-model="selectedRanges">
-                            Gama media
-                        </label>
-
-                        <label>
-                            <input type="checkbox" value="Gama baja" v-model="selectedRanges">
-                            Gama baja
-                        </label>
-                    </div>
-
-                    <div class="filter-card">
-                        <h4>Sistema Operativo</h4>
-
-                        <label>
-                            <input type="checkbox" value="iOS" v-model="selectedSystems">
-                            iOS
-                        </label>
-
-                        <label>
-                            <input type="checkbox" value="Android" v-model="selectedSystems">
-                            Android
-                        </label>
-                    </div>
-
-                    <div class="filter-card">
-                        <h4>Memoria</h4>
-
-                        <label>
-                            <input type="checkbox" value="64" v-model="selectedMemories">
-                            64 GB
-                        </label>
-
-                        <label>
-                            <input type="checkbox" value="128" v-model="selectedMemories">
-                            128 GB
-                        </label>
-
-                        <label>
-                            <input type="checkbox" value="256" v-model="selectedMemories">
-                            256 GB
-                        </label>
-
-                        <label>
-                            <input type="checkbox" value="512" v-model="selectedMemories">
-                            512 GB
-                        </label>
-                    </div>
-
-                    <div class="filter-card">
-                        <h4>Precio</h4>
-
-                        <label class="price-input-label">
-                            Mínimo
-                            <input
-                                type="number"
-                                class="price-input"
-                                v-model.number="minPrice"
-                                min="0"
-                            >
-                        </label>
-
-                        <label class="price-input-label">
-                            Máximo
-                            <input
-                                type="number"
-                                class="price-input"
-                                v-model.number="maxPrice"
-                                min="0"
-                            >
-                        </label>
-                    </div>
-
-                    <button class="btn-secondary clear-filters-btn" @click="clearFilters">
-                        Limpiar filtros
-                    </button>
+                                        <div class="field col-12">
+                                            <label for="maxPrice">Máximo</label>
+                                            <InputNumber
+                                                id="maxPrice"
+                                                v-model="maxPrice"
+                                                inputClass="w-full"
+                                                class="w-full"
+                                                :min="0"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </Card>
                 </aside>
 
-                <div class="catalog-products">
-
-                    <div v-if="filteredProducts.length === 0" class="empty-message">
+                <div class="col-12 lg:col-9">
+                    <Message
+                        v-if="filteredProducts.length === 0"
+                        severity="info"
+                        :closable="false"
+                    >
                         No hay productos que coincidan con los filtros seleccionados.
-                    </div>
+                    </Message>
 
                     <template v-else>
-
-                        <div class="catalog-grid">
-
+                        <div class="grid">
                             <div
                                 v-for="product in paginatedProducts"
                                 :key="product.id"
-                                class="product-card"
+                                class="col-12 md:col-6 xl:col-4"
                             >
+                                <Card class="h-full product-card">
+                                    <template #header>
+                                        <div class="product-image-box">
+                                            <img
+                                                v-if="product.image"
+                                                :src="product.image"
+                                                :alt="product.name"
+                                                class="product-image"
+                                            >
 
-                                <img
-                                    v-if="product.image"
-                                    :src="product.image"
-                                    :alt="product.name"
-                                    class="product-image"
-                                >
+                                            <div v-else class="image-placeholder">
+                                                Imagen
+                                            </div>
+                                        </div>
+                                    </template>
 
-                                <div v-else class="image-placeholder">
-                                    Imagen
-                                </div>
+                                    <template #title>
+                                        <span class="text-xl">
+                                            {{ product.name }}
+                                        </span>
+                                    </template>
 
-                                <p class="product-brand">
-                                    {{ product.brand }}
-                                </p>
+                                    <template #subtitle>
+                                        <span class="text-primary font-semibold">
+                                            {{ product.brand }}
+                                        </span>
+                                    </template>
 
-                                <h3 class="product-name">
-                                    {{ product.name }}
-                                </h3>
+                                    <template #content>
+                                        <div class="flex flex-column gap-2">
+                                            <div class="flex justify-content-between text-700">
+                                                <span>{{ product.ram }}</span>
+                                                <span>{{ product.storage }}</span>
+                                            </div>
 
-                                <div class="product-specs">
-                                    <span>{{ product.ram }}</span>
-                                    <span>{{ product.storage }}</span>
-                                </div>
+                                            <div class="flex justify-content-between align-items-center">
+                                                <span class="text-2xl font-bold text-900">
+                                                    ₡{{ product.price }}
+                                                </span>
 
-                                <div class="product-specs">
-                                    <span>₡{{ product.price }}</span>
-                                    <span>{{ product.operating_system }}</span>
-                                </div>
+                                                <span class="text-sm text-600">
+                                                    {{ product.operating_system }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </template>
 
-                                <router-link
-                                    :to="'/producto/' + product.id"
-                                    class="btn-secondary product-button"
-                                >
-                                    Ver producto
-                                </router-link>
-
+                                    <template #footer>
+                                        <router-link
+                                            :to="'/producto/' + product.id"
+                                            class="no-underline"
+                                        >
+                                            <Button
+                                                label="Ver producto"
+                                                icon="pi pi-eye"
+                                                severity="secondary"
+                                                class="w-full"
+                                            />
+                                        </router-link>
+                                    </template>
+                                </Card>
                             </div>
-
                         </div>
 
-                        <div v-if="lastPage > 1" class="pagination">
-                            <button
-                                class="pagination-btn"
+                        <div
+                            v-if="lastPage > 1"
+                            class="flex justify-content-center align-items-center gap-2 mt-5 flex-wrap"
+                        >
+                            <Button
+                                label="Anterior"
+                                icon="pi pi-angle-left"
+                                severity="secondary"
                                 :disabled="currentPage === 1"
                                 @click="changePage(currentPage - 1)"
-                            >
-                                Anterior
-                            </button>
+                            />
 
-                            <button
+                            <Button
                                 v-for="page in lastPage"
                                 :key="page"
-                                class="pagination-number"
-                                :class="{ active: page === currentPage }"
+                                :label="String(page)"
+                                :severity="page === currentPage ? 'primary' : 'secondary'"
                                 @click="changePage(page)"
-                            >
-                                {{ page }}
-                            </button>
+                            />
 
-                            <button
-                                class="pagination-btn"
+                            <Button
+                                label="Siguiente"
+                                icon="pi pi-angle-right"
+                                iconPos="right"
+                                severity="secondary"
                                 :disabled="currentPage === lastPage"
                                 @click="changePage(currentPage + 1)"
-                            >
-                                Siguiente
-                            </button>
+                            />
                         </div>
-
                     </template>
-
                 </div>
-
             </div>
-
         </div>
-
     </section>
 </template>
 
 <script>
 export default {
-
     data() {
         return {
             category: {},
             products: [],
+
+            brands: [
+                'Xiaomi',
+                'Samsung',
+                'Apple',
+                'Redmi',
+                'Motorola',
+                'Huawei',
+                'Realme',
+                'Oppo'
+            ],
+
+            ranges: [
+                'Alta gama',
+                'Gama media',
+                'Gama baja'
+            ],
+
+            systems: [
+                'iOS',
+                'Android'
+            ],
+
+            memories: [
+                { label: '64 GB', value: '64' },
+                { label: '128 GB', value: '128' },
+                { label: '256 GB', value: '256' },
+                { label: '512 GB', value: '512' }
+            ],
 
             selectedBrands: [],
             selectedRanges: [],
@@ -260,7 +315,6 @@ export default {
     },
 
     computed: {
-
         isBrandCategory() {
             const categoryName = (this.category.name ?? '').toLowerCase()
 
@@ -278,7 +332,6 @@ export default {
 
         filteredProducts() {
             return this.products.filter(product => {
-
                 const brand = product.brand ?? ''
                 const system = product.operating_system ?? ''
                 const storage = product.storage ?? ''
@@ -325,7 +378,6 @@ export default {
         lastPage() {
             return Math.ceil(this.filteredProducts.length / this.perPage) || 1
         }
-
     },
 
     created() {
@@ -364,19 +416,14 @@ export default {
     },
 
     methods: {
-
         loadCategory() {
-
             fetch('/api/categories/' + this.$route.params.id)
                 .then(response => response.json())
                 .then(data => {
-
                     this.category = data
                     this.products = data.products ?? []
                     this.currentPage = 1
-
                 })
-
         },
 
         clearFilters() {
@@ -396,8 +443,6 @@ export default {
 
             this.currentPage = page
         }
-
     }
-
 }
 </script>
